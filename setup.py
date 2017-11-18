@@ -9,7 +9,8 @@ setup(
         'keras',
         'sklearn',
         'nltk',
-        'h5py'
+        'h5py',
+        'PIL'
     ],
     setup_requires=[
         'pytest-runner',

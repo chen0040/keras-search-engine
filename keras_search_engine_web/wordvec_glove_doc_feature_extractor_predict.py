@@ -1,6 +1,5 @@
 from keras.models import model_from_json
 import numpy as np
-from keras.preprocessing.sequence import pad_sequences
 import nltk
 import os
 import sys
