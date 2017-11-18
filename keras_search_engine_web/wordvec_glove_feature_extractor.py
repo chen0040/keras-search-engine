@@ -1,12 +1,11 @@
-from keras.models import model_from_json
 import numpy as np
-from keras.preprocessing.sequence import pad_sequences
 import nltk
 import os
 import sys
 import zipfile
 import urllib.request
 
+MAX_SEQ_LENGTH = 3000
 EMBED_SIZE = 100
 GLOVE_MODEL = "../keras_search_engine_train/very_large_data/glove.6B." + str(EMBED_SIZE) + "d.txt"
 
@@ -42,35 +41,31 @@ def download_glove():
 
 
 def load_glove():
-    _word2em = {}
+    download_glove()
+    word2em = {}
     file = open(GLOVE_MODEL, mode='rt', encoding='utf8')
     for line in file:
         words = line.strip().split()
         word = words[0]
         embeds = np.array(words[1:], dtype=np.float32)
-        _word2em[word] = embeds
+        word2em[word] = embeds
     file.close()
-    return _word2em
+    return word2em
 
 
 class WordVecGloveFeatureExtractor(object):
-    model = None
     word2em = None
     context = None
 
     def __init__(self):
         self.word2em = load_glove()
-        json = open('../keras_search_engine_train/models/glove_fe_architecture.json', 'r').read()
-        self.model = model_from_json(json)
-        self.model.load_weights('../keras_search_engine_train/models/glove_fe_weights.h5')
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        self.context = np.load('../keras_search_engine_train/models/umich_context_glove.npy').item()
+        self.context = dict()
+        self.context['maxlen'] = MAX_SEQ_LENGTH
 
     def extract(self, sentence):
         max_len = self.context['maxlen']
         tokens = [w.lower() for w in nltk.word_tokenize(sentence)]
 
-        X = np.zeros(shape=(1, EMBED_SIZE))
         E = np.zeros(shape=(EMBED_SIZE, max_len))
         for j in range(0, len(tokens) - 1):
             word = tokens[j]
@@ -78,13 +73,28 @@ class WordVecGloveFeatureExtractor(object):
                 E[:, j] = self.word2em[word]
             except KeyError:
                 pass
-        X[0, :] = np.sum(E, axis=1)
-        output = self.model.predict(X)
-        negative, positive = output[0]
-        return [positive, negative]
+        return np.sum(E, axis=1)
+
+    def extract_all(self, sentences):
+        doc_count = len(sentences)
+        max_len = self.context['maxlen']
+
+        result = []
+        for k in range(doc_count-1):
+            tokens = [w.lower() for w in nltk.word_tokenize(sentences[k])]
+
+            E = np.zeros(shape=(EMBED_SIZE, max_len))
+            for j in range(0, len(tokens) - 1):
+                word = tokens[j]
+                try:
+                    E[:, j] = self.word2em[word]
+                except KeyError:
+                    pass
+            result.append(np.sum(E, axis=1))
+        return result
 
     def test_run(self, sentence):
-        print(self.predict(sentence))
+        print(self.extract(sentence))
 
 
 if __name__ == '__main__':
