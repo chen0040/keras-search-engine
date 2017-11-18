@@ -9,6 +9,7 @@ MAX_SEQ_LENGTH = 3000
 EMBED_SIZE = 100
 GLOVE_MODEL = "../keras_search_engine_train/very_large_data/glove.6B." + str(EMBED_SIZE) + "d.txt"
 
+
 def reporthook(block_num, block_size, total_size):
     read_so_far = block_num * block_size
     if total_size > 0:
@@ -67,7 +68,7 @@ class WordVecGloveFeatureExtractor(object):
         tokens = [w.lower() for w in nltk.word_tokenize(sentence)]
 
         E = np.zeros(shape=(EMBED_SIZE, max_len))
-        for j in range(0, len(tokens) - 1):
+        for j in range(0, len(tokens)):
             word = tokens[j]
             try:
                 E[:, j] = self.word2em[word]
@@ -80,11 +81,11 @@ class WordVecGloveFeatureExtractor(object):
         max_len = self.context['maxlen']
 
         result = []
-        for k in range(doc_count-1):
+        for k in range(doc_count):
             tokens = [w.lower() for w in nltk.word_tokenize(sentences[k])]
 
             E = np.zeros(shape=(EMBED_SIZE, max_len))
-            for j in range(0, len(tokens) - 1):
+            for j in range(0, len(tokens)):
                 word = tokens[j]
                 try:
                     E[:, j] = self.word2em[word]
@@ -93,11 +94,11 @@ class WordVecGloveFeatureExtractor(object):
             result.append(np.sum(E, axis=1))
         return result
 
-    def test_run(self, sentence):
-        print(self.extract(sentence))
+    def test_run(self):
+        print(self.extract('i liked the Da Vinci Code a lot.'))
+        print(self.extract_all(['Hello World', 'Hello Good Morning']))
 
 
 if __name__ == '__main__':
     app = WordVecGloveFeatureExtractor()
-    app.test_run('i liked the Da Vinci Code a lot.')
-    app.test_run('i hated the Da Vinci Code a lot.')
+    app.test_run()

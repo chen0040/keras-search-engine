@@ -72,7 +72,7 @@ class WordVecGloveDocFeatureExtractor(object):
 
         X = np.zeros(shape=EMBED_SIZE)
         E = np.zeros(shape=(EMBED_SIZE, max_len))
-        for j in range(0, len(tokens) - 1):
+        for j in range(0, len(tokens)):
             word = tokens[j]
             try:
                 E[:, j] = self.word2em[word]

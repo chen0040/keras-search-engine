@@ -11,7 +11,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
 fe_glove_c = WordVecGloveFeatureExtractor()
-fe_glove_c.test_run('i like the Da Vinci Code a lot.')
+fe_glove_c.test_run()
 
 
 @app.route('/')
