@@ -17,7 +17,7 @@ class VGG16ImageSearchEngine(object):
         if not os.path.exists('uploads'):
             os.makedirs('uploads')
 
-    def index_images(self, img_path):
+    def index_image(self, img_path):
         img_feature = self.fe.extract(img_path)
         img_id = len(self.img_features)
         self.img_features.append(img_feature)
@@ -67,11 +67,7 @@ class VGG16ImageSearchEngine(object):
             file_path = os.path.join(DATA_DIR_PATH, file)
             if os.path.isfile(file_path):
                 print('processing file: ', file)
-                lines = open(file_path, 'rt', encoding='utf8').read().split('\n')
-                text = ''
-                for line in lines:
-                    text += line
-                self.index_imgument(text, file_path)
+                self.index_image(file_path)
 
     def img_count(self):
         return len(self.img_features)
