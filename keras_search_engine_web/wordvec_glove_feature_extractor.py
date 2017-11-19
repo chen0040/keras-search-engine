@@ -5,7 +5,7 @@ import sys
 import zipfile
 import urllib.request
 
-MAX_SEQ_LENGTH = 3000
+MAX_SEQ_LENGTH = 5000
 EMBED_SIZE = 100
 GLOVE_MODEL = "../keras_search_engine_train/very_large_data/glove.6B." + str(EMBED_SIZE) + "d.txt"
 
@@ -68,7 +68,7 @@ class WordVecGloveFeatureExtractor(object):
         tokens = [w.lower() for w in nltk.word_tokenize(sentence)]
 
         E = np.zeros(shape=(EMBED_SIZE, max_len))
-        for j in range(0, len(tokens)):
+        for j in range(0, min(len(tokens), max_len)):
             word = tokens[j]
             try:
                 E[:, j] = self.word2em[word]

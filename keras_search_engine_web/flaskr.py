@@ -1,6 +1,6 @@
 from flask import Flask, request, send_from_directory, redirect, render_template, flash, url_for, jsonify, \
     make_response, abort
-from keras_search_engine_web.wordvec_glove_feature_extractor import WordVecGloveFeatureExtractor
+from keras_search_engine_web.glove_doc_search_engine import GloveDocSearchEngine
 
 app = Flask(__name__)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
@@ -10,8 +10,9 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
-fe_glove_c = WordVecGloveFeatureExtractor()
-fe_glove_c.test_run()
+glove_doc_search_engine = GloveDocSearchEngine()
+glove_doc_search_engine.do_default_indexing()
+glove_doc_search_engine.test_run()
 
 
 @app.route('/')
@@ -24,8 +25,8 @@ def about():
     return 'About Us'
 
 
-@app.route('/ffn_glove', methods=['POST', 'GET'])
-def ffn_glove():
+@app.route('/search_text_glove', methods=['POST', 'GET'])
+def search_text_glove():
     if request.method == 'POST':
         if 'sentence' not in request.form:
             flash('No sentence post')
@@ -35,33 +36,33 @@ def ffn_glove():
             redirect(request.url)
         else:
             sent = request.form['sentence']
-            sentiments = fe_glove_c.predict(sent)
-            return render_template('ffn_glove_result.html', sentence=sent,
+            sentiments = glove_doc_search_engine.rank_top_k(sent)
+            return render_template('search_text_glove.html', sentence=sent,
                                    sentiments=sentiments)
-    return render_template('ffn_glove.html')
+    return render_template('search_text_glove.html')
 
 
-@app.route('/measure_sentiments', methods=['POST', 'GET'])
+@app.route('/search_text', methods=['POST', 'GET'])
 def measure_sentiment():
     if request.method == 'POST':
-        if not request.json or 'sentence' not in request.json or 'network' not in request.json:
+        if not request.json or 'sentence' not in request.json or 'model' not in request.json \
+                or 'limit' not in request.json:
             abort(400)
         sentence = request.json['sentence']
-        network = request.json['network']
+        model = request.json['model']
+        limit = request.json['limit']
     else:
         sentence = request.args.get('sentence')
-        network = request.args.get('network')
+        model = request.args.get('model')
+        limit = request.args.get('limit')
 
-    sentiments = []
-    if network == 'cnn':
-        sentiments = fe_glove_c.predict(sentence)
-    elif network == 'ffn_glove':
-        sentiments = fe_glove_c.predict(sentence)
+    docs = []
+    if model == 'glove':
+        docs = glove_doc_search_engine.query_top_k(sentence, k=limit)
     return jsonify({
         'sentence': sentence,
-        'pos_sentiment': float(str(sentiments[0])),
-        'neg_sentiment': float(str(sentiments[1])),
-        'network': network
+        'result': docs,
+        'model': model
     })
 
 
