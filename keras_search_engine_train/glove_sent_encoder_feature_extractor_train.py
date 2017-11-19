@@ -8,7 +8,6 @@ from keras.models import Model
 from keras.preprocessing import sequence
 import sys
 import collections
-import matplotlib.pyplot as plt
 import nltk
 import numpy as np
 import os
@@ -24,13 +23,14 @@ BATCH_SIZE = 64
 NUM_EPOCHS = 10
 
 LATENT_SIZE = 512
-SEQUENCE_LEN = 50
+MAX_SEQ_LEN = 5000
 
 CACHE_DIR = './cache'
 VERY_LARGE_DATA_DIR = './very_large_data'
-NEWS_DATA_DIR = './data'
+NEWS_DATA_DIR = './data/news'
 GLOVE_MODEL = VERY_LARGE_DATA_DIR + "/glove.6B." + str(EMBED_SIZE) + "d.txt"
 TRAINING_FILE_PATH = os.path.join(NEWS_DATA_DIR, "reuters-21528-text.tsv")
+MODEL_DIR = './models'
 
 
 def reporthook(block_num, block_size, total_size):
@@ -64,19 +64,6 @@ def download_glove():
         zip_ref.close()
 
 
-def load_glove():
-    download_glove()
-    word2em = {}
-    file = open(GLOVE_MODEL, mode='rt', encoding='utf8')
-    for line in file:
-        words = line.strip().split()
-        word = words[0]
-        embeds = np.array(words[1:], dtype=np.float32)
-        word2em[word] = embeds
-    file.close()
-    return word2em
-
-
 def lookup_word2id(word2id, word):
     try:
         return word2id[word]
@@ -84,7 +71,9 @@ def lookup_word2id(word2id, word):
         return word2id['UNK']
 
 
-def load_glove_vectors(glove_file, word2id, embed_size):
+def load_glove_vectors(word2id, embed_size):
+    download_glove()
+    glove_file = os.path.join(VERY_LARGE_DATA_DIR, "glove.6B.{:d}d.txt".format(EMBED_SIZE))
     embedding = np.zeros((len(word2id), embed_size))
     fglove = open(glove_file, "rb")
     for line in fglove:
@@ -92,10 +81,10 @@ def load_glove_vectors(glove_file, word2id, embed_size):
         word = cols[0]
         if embed_size == 0:
             embed_size = len(cols) - 1
-        if word2id.has_key(word):
+        if word in word2id:
             vec = np.array([float(v) for v in cols[1:]])
-        embedding[lookup_word2id(word)] = vec
-    embedding[word2id["PAD"]] = np.zeros((embed_size))
+            embedding[lookup_word2id(word2id, word)] = vec
+    embedding[word2id["PAD"]] = np.zeros(shape=embed_size)
     embedding[word2id["UNK"]] = np.random.uniform(-1, 1, embed_size)
     return embedding
 
@@ -139,13 +128,14 @@ id2word = {v: k for k, v in word2id.items()}
 
 print("vocabulary sizes:", len(word2id), len(id2word))
 
-sent_wids = [[lookup_word2id(w) for w in s.split()]
-             for s in sents]
-sent_wids = sequence.pad_sequences(sent_wids, SEQUENCE_LEN)
+np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-word2id.np'), word2id)
+np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-id2word.np'), id2word)
+
+sent_wids = [[lookup_word2id(word2id, w) for w in s.split()] for s in sents]
+sent_wids = sequence.pad_sequences(sent_wids, MAX_SEQ_LEN)
 
 # load glove vectors into weight matrix
-embeddings = load_glove_vectors(os.path.join(
-    VERY_LARGE_DATA_DIR, "glove.6B.{:d}d.txt".format(EMBED_SIZE)), word2id, EMBED_SIZE)
+embeddings = load_glove_vectors(word2id, EMBED_SIZE)
 print(embeddings.shape)
 
 # split sentences into training and test
@@ -159,17 +149,17 @@ train_gen = sentence_generator(Xtrain, embeddings, BATCH_SIZE)
 test_gen = sentence_generator(Xtest, embeddings, BATCH_SIZE)
 
 # define autoencoder network
-inputs = Input(shape=(SEQUENCE_LEN, EMBED_SIZE), name="input")
+inputs = Input(shape=(MAX_SEQ_LEN, EMBED_SIZE), name="input")
 encoded = Bidirectional(LSTM(LATENT_SIZE), merge_mode="sum",
                         name="encoder_lstm")(inputs)
-decoded = RepeatVector(SEQUENCE_LEN, name="repeater")(encoded)
+decoded = RepeatVector(MAX_SEQ_LEN, name="repeater")(encoded)
 decoded = Bidirectional(LSTM(EMBED_SIZE, return_sequences=True),
                         merge_mode="sum",
                         name="decoder_lstm")(decoded)
 
-autoencoder = Model(inputs, decoded)
+auto_encoder = Model(inputs, decoded)
 
-autoencoder.compile(optimizer="sgd", loss="mse")
+auto_encoder.compile(optimizer="sgd", loss="mse")
 
 if not os.path.exists(CACHE_DIR):
     os.makedirs(CACHE_DIR)
@@ -177,50 +167,16 @@ if not os.path.exists(CACHE_DIR):
 # train
 num_train_steps = len(Xtrain) // BATCH_SIZE
 num_test_steps = len(Xtest) // BATCH_SIZE
-checkpoint = ModelCheckpoint(filepath=os.path.join(CACHE_DIR, "sent-thoughts-autoencoder.h5"),
+checkpoint = ModelCheckpoint(filepath=os.path.join(CACHE_DIR, "sent-autoencoder.h5"),
                              save_best_only=True)
-history = autoencoder.fit_generator(train_gen,
-                                    steps_per_epoch=num_train_steps,
-                                    epochs=NUM_EPOCHS,
-                                    validation_data=test_gen,
-                                    validation_steps=num_test_steps,
-                                    callbacks=[checkpoint])
+history = auto_encoder.fit_generator(train_gen,
+                                     steps_per_epoch=num_train_steps,
+                                     epochs=NUM_EPOCHS,
+                                     validation_data=test_gen,
+                                     validation_steps=num_test_steps,
+                                     callbacks=[checkpoint])
 
-# plot results
-plt.plot(history.history["loss"], color="g", label="train")
-plt.plot(history.history["val_loss"], color="b", label="validation")
-plt.ylabel("loss (MSE)")
-plt.xlabel("epochs")
-plt.legend(loc="best")
-plt.show()
+auto_encoder.save_weights(filepath=os.path.join(MODEL_DIR, 'sent-autoencoder.h5'))
 
-# collect autoencoder predictions for test set
-test_inputs, test_labels = test_gen.next()
-preds = autoencoder.predict(test_inputs)
 
-# extract encoder part from autoencoder
-encoder = Model(autoencoder.input, autoencoder.get_layer("encoder_lstm").output)
-# encoder.summary()
 
-# compute difference between vector produced by original and autoencoded
-k = 500
-cosims = np.zeros(shape=k)
-i = 0
-for bid in range(num_test_steps):
-    xtest, ytest = test_gen.next()
-    ytest_ = autoencoder.predict(xtest)
-    Xvec = encoder.predict(xtest)
-    Yvec = encoder.predict(ytest_)
-    for rid in range(Xvec.shape[0]):
-        if i >= k:
-            break
-        cosims[i] = compute_cosine_similarity(Xvec[rid], Yvec[rid])
-        if i <= 10:
-            print(cosims[i])
-        i += 1
-    if i >= k:
-        break
-
-plt.hist(cosims, bins=10, normed=True)
-plt.xlabel("cosine similarity")
-plt.ylabel("frequency")
