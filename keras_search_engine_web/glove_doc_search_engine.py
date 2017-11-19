@@ -1,9 +1,27 @@
-from keras_search_engine_web.wordvec_glove_feature_extractor import WordVecGloveFeatureExtractor
+from keras_search_engine_web.glove_feature_extractor import WordVecGloveFeatureExtractor
 import numpy as np
 import os
 
 GLOVE_EMBEDDING_SIZE = 100
 DATA_DIR_PATH = '../keras_search_engine_train/data/texts'
+
+
+def compute_cosine_similarity(X, y):
+    dist = []
+    for doc_id in range(len(X)):
+        x = X[doc_id]
+        dist.append(np.dot(x, y) / (np.linalg.norm(x, 2) * np.linalg.norm(y, 2)))
+    return dist
+
+
+def compute_similarity(X, y):
+    query_diff = []
+    doc_count = len(X)
+    for doc_id in range(doc_count):
+        doc_feature = X[doc_id]
+        query_diff.append(doc_feature - y)
+    dist = np.linalg.norm(query_diff, axis=1)
+    return dist
 
 
 class GloveDocSearchEngine(object):
@@ -51,12 +69,7 @@ class GloveDocSearchEngine(object):
 
     def rank_top_k(self, query, k):
         query_feature = self.fe.extract(query)
-        doc_count = len(self.doc_features)
-        query_diff = []
-        for doc_id in range(doc_count):
-            doc_feature = self.doc_features[doc_id]
-            query_diff.append(doc_feature - query_feature)
-        dist = np.linalg.norm(query_diff, axis=1)
+        dist = compute_similarity(self.doc_features, query_feature)
         ids = np.argsort(dist)[:min(len(dist), k)]
         dist = [dist[id] for id in ids]
         return ids, dist

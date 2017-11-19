@@ -12,6 +12,7 @@ __pycache__/
 Thumbs.db
 
 keras_search_engine_web/uploads
+keras_search_engine_train/cache
 keras_search_engine_train/very_large_data
 
 # Distribution / packaging
