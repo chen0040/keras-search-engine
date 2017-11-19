@@ -2,7 +2,6 @@ from keras_search_engine_web.vgg16_feature_extractor import VGG16FeatureExtracto
 import numpy as np
 import os
 
-GLOVE_EMBEDDING_SIZE = 100
 DATA_DIR_PATH = '../keras_search_engine_train/data/images'
 
 
@@ -74,8 +73,8 @@ class VGG16ImageSearchEngine(object):
 
     def test_run(self):
         if self.img_count() == 0:
-            self.index_images(['Hello World', 'What a wonderful world!'])
-        print(self.rank_top_k('Hello', k=30))
+            self.index_images([os.path.join(DATA_DIR_PATH, 'Pokemon1.jpg'), os.path.join(DATA_DIR_PATH, 'Pokemon2.jpg')])
+        print(self.rank_top_k(os.path.join(DATA_DIR_PATH, 'Pokemon1.jpg'), k=30))
 
 
 if __name__ == '__main__':

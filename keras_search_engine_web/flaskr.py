@@ -1,6 +1,7 @@
 from flask import Flask, request, send_from_directory, redirect, render_template, flash, url_for, jsonify, \
     make_response, abort
 from keras_search_engine_web.glove_doc_search_engine import GloveDocSearchEngine
+from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngine
 
 app = Flask(__name__)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
@@ -14,6 +15,9 @@ glove_doc_search_engine = GloveDocSearchEngine()
 glove_doc_search_engine.do_default_indexing()
 glove_doc_search_engine.test_run()
 
+vgg16_image_search_engine = VGG16ImageSearchEngine()
+vgg16_image_search_engine.do_default_indexing()
+vgg16_image_search_engine.test_run()
 
 @app.route('/')
 def home():
@@ -36,9 +40,9 @@ def search_text_glove():
             redirect(request.url)
         else:
             sent = request.form['sentence']
-            sentiments = glove_doc_search_engine.rank_top_k(sent)
+            search_result = glove_doc_search_engine.rank_top_k(sent)
             return render_template('search_text_glove.html', sentence=sent,
-                                   sentiments=sentiments)
+                                   search_result=search_result)
     return render_template('search_text_glove.html')
 
 
