@@ -11,6 +11,9 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
+glove_story_search_engine = GloveDocSearchEngine()
+glove_story_search_engine.use_cosine_distance = True
+
 glove_doc_search_engine = GloveDocSearchEngine()
 vgg16_image_search_engine = VGG16ImageSearchEngine()
 
@@ -24,42 +27,43 @@ def about():
     return 'About Us'
 
 
-@app.route('/search_text_glove', methods=['POST', 'GET'])
-def search_text_glove():
+@app.route('/search_story_glove', methods=['POST', 'GET'])
+def search_story_glove():
     if request.method == 'POST':
-        if 'sentence' not in request.form:
-            flash('No sentence post')
+        if 'query' not in request.form:
+            flash('No query post')
             redirect(request.url)
-        elif request.form['sentence'] == '':
-            flash('No sentence')
+        elif request.form['query'] == '':
+            flash('No query')
             redirect(request.url)
         else:
-            sent = request.form['sentence']
-            search_result = glove_doc_search_engine.rank_top_k(sent)
-            return render_template('search_text_glove.html', sentence=sent,
+            query = request.form['query']
+            search_result = glove_story_search_engine.query_top_k(query, k=5)
+            print(search_result)
+            return render_template('search_story_glove.html', query=query,
                                    search_result=search_result)
-    return render_template('search_text_glove.html')
+    return render_template('search_story_glove.html')
 
 
 @app.route('/search_text', methods=['POST', 'GET'])
-def measure_sentiment():
+def search_text():
     if request.method == 'POST':
-        if not request.json or 'sentence' not in request.json or 'model' not in request.json \
+        if not request.json or 'query' not in request.json or 'model' not in request.json \
                 or 'limit' not in request.json:
             abort(400)
-        sentence = request.json['sentence']
+            query = request.json['query']
         model = request.json['model']
         limit = request.json['limit']
     else:
-        sentence = request.args.get('sentence')
+        query = request.args.get('query')
         model = request.args.get('model')
         limit = request.args.get('limit')
 
     docs = []
     if model == 'glove':
-        docs = glove_doc_search_engine.query_top_k(sentence, k=limit)
+        docs = glove_doc_search_engine.query_top_k(query, k=limit)
     return jsonify({
-        'sentence': sentence,
+        'query': query,
         'result': docs,
         'model': model
     })
@@ -71,7 +75,8 @@ def not_found(error):
 
 
 def main():
-    glove_doc_search_engine.do_default_indexing()
+    glove_story_search_engine.do_default_indexing()
+    glove_story_search_engine.test_run()
     glove_doc_search_engine.test_run()
 
     vgg16_image_search_engine.do_default_indexing()

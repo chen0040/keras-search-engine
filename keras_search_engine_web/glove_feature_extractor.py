@@ -5,7 +5,7 @@ import sys
 import zipfile
 import urllib.request
 
-MAX_SEQ_LENGTH = 5000
+MAX_SEQ_LENGTH = 2000
 EMBED_SIZE = 100
 VERY_LARGE_DATA_DIR = '../keras_search_engine_train/very_large_data'
 GLOVE_MODEL = VERY_LARGE_DATA_DIR + "/glove.6B." + str(EMBED_SIZE) + "d.txt"

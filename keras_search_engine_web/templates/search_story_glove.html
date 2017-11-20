@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+    <p>Write query here then we will rank and search document for you</p>
+    <form method=post>
+      <p>Write your query here: <input type=text name=query value="{{query}}"></p>
+         <input type=submit value=Evaluate>
+    </form>
+    <ul>
+        {% for line in search_result %}
+        <li>
+            <p>ID: {{line.doc_id}} (Rank: {{line.rank}})</p>
+            <p>Path: {{line.path}} </p>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

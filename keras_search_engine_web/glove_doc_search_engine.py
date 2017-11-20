@@ -28,6 +28,7 @@ class GloveDocSearchEngine(object):
     fe = None
     doc_features = None
     doc_paths = dict()
+    use_cosine_distance = False
 
     def __init__(self):
         self.fe = WordVecGloveFeatureExtractor()
@@ -67,9 +68,14 @@ class GloveDocSearchEngine(object):
                 f.close()
                 self.doc_paths[doc_id] = doc_text
 
-    def rank_top_k(self, query, k):
+    def rank_top_k(self, query, k=None):
+        if k is None:
+            k = 10
         query_feature = self.fe.extract(query)
-        dist = compute_similarity(self.doc_features, query_feature)
+        if self.use_cosine_distance:
+            dist = compute_cosine_similarity(self.doc_features, query_feature)
+        else:
+            dist = compute_similarity(self.doc_features, query_feature)
         ids = np.argsort(dist)[:min(len(dist), k)]
         dist = [dist[id] for id in ids]
         return ids, dist
@@ -77,7 +83,9 @@ class GloveDocSearchEngine(object):
     def get_doc(self, doc_ids):
         return [self.doc_paths[doc_id] for doc_id in doc_ids]
 
-    def query_top_k(self, query, k):
+    def query_top_k(self, query, k=None):
+        if k is None:
+            k = 10
         ids, dist = self.rank_top_k(query, k)
         result = []
         for i in range(len(ids)):
