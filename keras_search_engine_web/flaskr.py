@@ -12,12 +12,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
 glove_doc_search_engine = GloveDocSearchEngine()
-glove_doc_search_engine.do_default_indexing()
-glove_doc_search_engine.test_run()
-
 vgg16_image_search_engine = VGG16ImageSearchEngine()
-vgg16_image_search_engine.do_default_indexing()
-vgg16_image_search_engine.test_run()
 
 @app.route('/')
 def home():
@@ -75,5 +70,14 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-if __name__ == '__main__':
+def main():
+    glove_doc_search_engine.do_default_indexing()
+    glove_doc_search_engine.test_run()
+
+    vgg16_image_search_engine.do_default_indexing()
+    vgg16_image_search_engine.test_run()
+
     app.run(debug=True)
+
+if __name__ == '__main__':
+    main()

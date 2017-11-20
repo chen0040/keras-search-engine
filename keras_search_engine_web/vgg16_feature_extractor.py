@@ -39,6 +39,11 @@ class VGG16FeatureExtractor:
     def run_test(self):
         print(self.extract('../keras_search_engine_train/data/images/Pokemon1.jpg'))
 
-if __name__ == '__main__':
+
+def main():
     classifier = VGG16FeatureExtractor()
     classifier.run_test()
+
+
+if __name__ == '__main__':
+    main()

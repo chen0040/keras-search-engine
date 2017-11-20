@@ -100,6 +100,9 @@ class WordVecGloveFeatureExtractor(object):
         print(self.extract_all(['Hello World', 'Hello Good Morning']))
 
 
-if __name__ == '__main__':
+def main():
     app = WordVecGloveFeatureExtractor()
     app.test_run()
+
+if __name__ == '__main__':
+    main()

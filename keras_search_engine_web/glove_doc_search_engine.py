@@ -111,6 +111,9 @@ class GloveDocSearchEngine(object):
         print(self.rank_top_k('Hello', k=30))
 
 
-if __name__ == '__main__':
+def main():
     search_engine = GloveDocSearchEngine()
     search_engine.test_run()
+
+if __name__ == '__main__':
+    main()

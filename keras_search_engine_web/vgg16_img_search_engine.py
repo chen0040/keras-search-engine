@@ -77,6 +77,9 @@ class VGG16ImageSearchEngine(object):
         print(self.rank_top_k(os.path.join(DATA_DIR_PATH, 'Pokemon1.jpg'), k=30))
 
 
-if __name__ == '__main__':
+def main():
     search_engine = VGG16ImageSearchEngine()
     search_engine.test_run()
+
+if __name__ == '__main__':
+    main()

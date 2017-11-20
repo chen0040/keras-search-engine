@@ -100,11 +100,13 @@ class WordVecGloveDocFeatureExtractor(object):
         X = self.embedding[sent_wids]
         return self.auto_encoder.predict(X)[0]
 
-    def test_run(self, sentence):
-        print(self.extract(sentence))
+    def test_run(self):
+        print(self.extract('i liked the Da Vinci Code a lot.'))
 
+
+def main():
+    app = WordVecGloveDocFeatureExtractor()
+    app.test_run()
 
 if __name__ == '__main__':
-    app = WordVecGloveDocFeatureExtractor()
-    app.test_run('i liked the Da Vinci Code a lot.')
-    app.test_run('i hated the Da Vinci Code a lot.')
+    main()
