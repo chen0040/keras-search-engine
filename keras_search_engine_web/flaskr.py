@@ -12,7 +12,6 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
 glove_story_search_engine = GloveDocSearchEngine()
-glove_story_search_engine.use_cosine_distance = True
 
 glove_doc_search_engine = GloveDocSearchEngine()
 vgg16_image_search_engine = VGG16ImageSearchEngine()

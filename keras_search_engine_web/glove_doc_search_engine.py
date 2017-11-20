@@ -28,7 +28,7 @@ class GloveDocSearchEngine(object):
     fe = None
     doc_features = None
     doc_paths = dict()
-    use_cosine_distance = False
+    use_cosine_distance = True
 
     def __init__(self):
         self.fe = WordVecGloveFeatureExtractor()
