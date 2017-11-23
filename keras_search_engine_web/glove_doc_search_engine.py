@@ -24,6 +24,11 @@ def compute_similarity(X, y):
     return dist
 
 
+def get_content(path):
+    with open(path, 'r', encoding='utf8') as file:
+        return file.read()
+
+
 class GloveDocSearchEngine(object):
     fe = None
     doc_features = None
@@ -48,7 +53,7 @@ class GloveDocSearchEngine(object):
             f.write(doc_text)
             f.close()
             self.doc_paths[doc_id] = doc_path
-        return doc_feature
+        return doc_feature.tolist()
 
     def index_documents(self, doc_texts, doc_paths=None):
         doc_count = len(self.doc_features)
@@ -67,7 +72,7 @@ class GloveDocSearchEngine(object):
                 f = open(doc_path, 'wt')
                 f.write(doc_text)
                 f.close()
-                self.doc_paths[doc_id] = doc_text
+                self.doc_paths[doc_id] = doc_path
 
     def rank_top_k(self, query, k=None):
         if k is None:
@@ -96,7 +101,8 @@ class GloveDocSearchEngine(object):
             result.append({
                 'doc_id': doc_id,
                 'rank': rank,
-                'path': doc_path
+                'path': doc_path,
+                'content': get_content(doc_path)
             })
         return result
 
@@ -123,6 +129,7 @@ class GloveDocSearchEngine(object):
 def main():
     search_engine = GloveDocSearchEngine()
     search_engine.test_run()
+
 
 if __name__ == '__main__':
     main()

@@ -47,7 +47,7 @@ curl -H 'Content-Type application/json' -X POST -d '{"doc":"I find that the hard
 To query using the web api, you can call the following web api:
 
 ```bash
-curl -H 'Content-Type application/json' -X POST -d '{"query":"mathematician and coffee", limit: 3, model: "glove"}' http://localhost:5000/search_text
+curl -H 'Content-Type application/json' -X POST -d '{"query":"mathematician and coffee", "limit": 3, "model": "glove"}' http://localhost:5000/search_text
 ```
 
 
