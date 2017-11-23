@@ -10,11 +10,11 @@ app.config.from_object(__name__)  # load config from this file , flaskr.py
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
-
 glove_story_search_engine = GloveDocSearchEngine()
 
 glove_doc_search_engine = GloveDocSearchEngine()
 vgg16_image_search_engine = VGG16ImageSearchEngine()
+
 
 @app.route('/')
 def home():
@@ -44,13 +44,28 @@ def search_story_glove():
     return render_template('search_story_glove.html')
 
 
+@app.route('/index_text', methods=['POST', 'GET'])
+def index_text():
+    if request.method == 'POST':
+        if not request.json or 'doc' not in request.json:
+            abort(400)
+        doc = request.json['doc']
+    else:
+        doc = request.args.get('doc')
+
+    doc_feature = glove_doc_search_engine.index_document(doc)
+    return jsonify({
+        'doc_feature': doc_feature
+    })
+
+
 @app.route('/search_text', methods=['POST', 'GET'])
 def search_text():
     if request.method == 'POST':
         if not request.json or 'query' not in request.json or 'model' not in request.json \
                 or 'limit' not in request.json:
             abort(400)
-            query = request.json['query']
+        query = request.json['query']
         model = request.json['model']
         limit = request.json['limit']
     else:
@@ -82,6 +97,7 @@ def main():
     vgg16_image_search_engine.test_run()
 
     app.run(debug=True)
+
 
 if __name__ == '__main__':
     main()

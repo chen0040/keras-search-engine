@@ -48,6 +48,7 @@ class GloveDocSearchEngine(object):
             f.write(doc_text)
             f.close()
             self.doc_paths[doc_id] = doc_path
+        return doc_feature
 
     def index_documents(self, doc_texts, doc_paths=None):
         doc_count = len(self.doc_features)
