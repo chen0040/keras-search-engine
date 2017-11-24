@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, redirect, render_template, flash, url_for, jsonify, \
+from flask import Flask, request, send_from_directory, send_file, redirect, render_template, flash, url_for, jsonify, \
     make_response, abort
 from keras_search_engine_web.glove_doc_search_engine import GloveDocSearchEngine
 from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngine
@@ -8,10 +8,8 @@ from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-
 app = Flask(__name__)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
-
 
 # Load default config and override config from an environment variable
 
@@ -55,6 +53,11 @@ def store_uploaded_image(action):
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for(action,
                                 filename=filename))
+
+
+@app.route('/get_image/<filename>')
+def get_image(filename):
+    return send_file(filename, mimetype='image/jpg')
 
 
 @app.route('/search_vgg16_image', methods=['GET', 'POST'])
