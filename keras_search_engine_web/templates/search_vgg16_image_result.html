@@ -4,6 +4,16 @@
     <br />
     <hr />
     The following are other similar images:
+
+    <ul>
+        {% for line in search_result %}
+        <li>
+            <p>ID: {{line.doc_id}} (Rank: {{line.rank}})</p>
+            <p>Path: {{line.path}} </p>
+        </li>
+        {% endfor %}
+    </ul>
+
     <hr />
-    <a href="{{ url_for('search_vgg16_image_result') }}">Try another picture</a>
+    <a href="{{ url_for('search_vgg16_image') }}">Try another picture</a>
 {% endblock %}

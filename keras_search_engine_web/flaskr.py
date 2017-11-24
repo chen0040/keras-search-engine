@@ -5,13 +5,15 @@ from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngi
 import os
 from werkzeug.utils import secure_filename
 
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+
 app = Flask(__name__)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
 
 
 # Load default config and override config from an environment variable
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -67,7 +69,7 @@ def search_vgg16_image_result(filename):
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     top5 = vgg16_image_search_engine.query_top_k(filepath, k=5)
     return render_template('search_vgg16_image_result.html', filename=filename,
-                           top5=top5)
+                           search_result=top5)
 
 
 @app.route('/search_story_glove', methods=['POST', 'GET'])
