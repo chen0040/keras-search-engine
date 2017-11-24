@@ -9,6 +9,7 @@ A simple document and image search engine implemented in keras
 * Support Document Indexing via web api
 * Support Image Search
 * Support Image Indexing via web api (WIP)
+* Document auto-encoding using LSTM encoder-decoder with GloVe Embedding
 
 # Usage
 

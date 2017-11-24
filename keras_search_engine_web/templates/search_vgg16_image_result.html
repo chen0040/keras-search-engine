@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block body %}
+    <img src="/images/{{ filename }}" />
+    <br />
+    <hr />
+    The following are other similar images:
+    <hr />
+    <a href="{{ url_for('search_vgg16_image_result') }}">Try another picture</a>
+{% endblock %}

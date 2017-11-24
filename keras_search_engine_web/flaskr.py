@@ -2,11 +2,17 @@ from flask import Flask, request, send_from_directory, redirect, render_template
     make_response, abort
 from keras_search_engine_web.glove_doc_search_engine import GloveDocSearchEngine
 from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngine
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(__name__)  # load config from this file , flaskr.py
 
+
 # Load default config and override config from an environment variable
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
@@ -24,6 +30,44 @@ def home():
 @app.route('/about')
 def about():
     return 'About Us'
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def store_uploaded_image(action):
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for(action,
+                                filename=filename))
+
+
+@app.route('/search_vgg16_image', methods=['GET', 'POST'])
+def search_vgg16_image():
+    if request.method == 'POST':
+        return store_uploaded_image('search_vgg16_image_result')
+    return render_template('search_vgg16_image.html')
+
+
+@app.route('/search_vgg16_image_result/<filename>')
+def search_vgg16_image_result(filename):
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    top5 = vgg16_image_search_engine.query_top_k(filepath, k=5)
+    return render_template('search_vgg16_image_result.html', filename=filename,
+                           top5=top5)
 
 
 @app.route('/search_story_glove', methods=['POST', 'GET'])
