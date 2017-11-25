@@ -2,7 +2,7 @@ from keras_search_engine_web.vgg16_feature_extractor import VGG16FeatureExtracto
 import numpy as np
 import os
 
-DATA_DIR_PATH = '../keras_search_engine_train/data/images'
+DATA_DIR_PATH = './data/images'
 
 
 class VGG16ImageSearchEngine(object):

@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 GLOVE_EMBEDDING_SIZE = 100
-DATA_DIR_PATH = '../keras_search_engine_train/data/texts'
+DATA_DIR_PATH = './data/texts'
 
 
 def compute_cosine_similarity(X, y):
