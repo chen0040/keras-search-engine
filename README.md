@@ -34,7 +34,7 @@ With the web api server running, you can index a new document by calling the fol
 http://localhost:5000/index_text
 ```
 
-For example the following is the curl command to call the web api to index "":
+For example the following is the curl command to call the web api to index some documents:
 
 ```bash
 curl -H 'Content-Type application/json' -X POST -d '{"doc":"Whether you think that you can, or that you can't, you are usually right."}' http://localhost:5000/index_text
@@ -49,6 +49,34 @@ To query using the web api, you can call the following web api:
 
 ```bash
 curl -H 'Content-Type application/json' -X POST -d '{"query":"mathematician and coffee", "limit": 3, "model": "glove"}' http://localhost:5000/search_text
+```
+
+## Invoke web api to index text document
+
+With the web api server running, you can index a new image by calling the following web api via POST request:
+
+```html
+http://localhost:5000/index_image
+```
+
+You can query similar images by calling the following web api POST request:
+
+```html
+http://localhost:5000/search_image/10
+```
+
+where 10 is the limit on the number of images returned
+
+For example the following python code the web api to index an image:
+
+```python 
+
+```
+
+To query using the web api, you can run the following python:
+
+```python
+
 ```
 
 

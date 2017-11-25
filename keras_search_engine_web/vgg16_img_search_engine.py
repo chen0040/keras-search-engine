@@ -21,6 +21,7 @@ class VGG16ImageSearchEngine(object):
         img_id = len(self.img_features)
         self.img_features.append(img_feature)
         self.img_paths[img_id] = img_path
+        return img_feature.tolist()
 
     def index_images(self, img_paths):
         img_count = len(self.img_features)

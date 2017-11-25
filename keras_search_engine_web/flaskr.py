@@ -93,6 +93,46 @@ def search_story_glove():
     return render_template('search_story_glove.html')
 
 
+@app.route('/index_image', methods=['POST'])
+def index_image():
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        return make_response(jsonify({'error': 'Uploaded file not found'}), 404)
+    file = request.files['file']
+    if file.filename == '':
+        return make_response(jsonify({'error': 'Uploaded filename is blank'}), 404)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        img_feature = vgg16_image_search_engine.index_images(file_path)
+        return jsonify({
+            'doc_feature': img_feature
+        })
+    else:
+        return make_response(jsonify({'error': 'Invalid file format'}), 404)
+
+
+@app.route('/search_image/<limit>', methods=['POST'])
+def search_image(limit):
+    if 'file' not in request.files:
+        return make_response(jsonify({'error': 'Uploaded file not found'}), 404)
+    file = request.files['file']
+    if file.filename == '':
+        return make_response(jsonify({'error': 'Uploaded filename is blank'}), 404)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        images = vgg16_image_search_engine.query_top_k(file_path, k=limit)
+        return jsonify({
+            'query': file_path,
+            'result': images
+        })
+    else:
+        return make_response(jsonify({'error': 'Invalid file format'}), 404)
+
+
 @app.route('/index_text', methods=['POST', 'GET'])
 def index_text():
     if request.method == 'POST':
