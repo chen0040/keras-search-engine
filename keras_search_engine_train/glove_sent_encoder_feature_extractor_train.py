@@ -21,11 +21,11 @@ NUM_FILTERS = 256
 NUM_WORDS = 3
 BATCH_SIZE = 64
 NUM_EPOCHS = 10
+MAX_LINE_NUMBER = 1000
 
 LATENT_SIZE = 512
 MAX_SEQ_LEN = 5000
 
-CACHE_DIR = './cache'
 VERY_LARGE_DATA_DIR = './very_large_data'
 NEWS_DATA_DIR = './data/news'
 GLOVE_MODEL = VERY_LARGE_DATA_DIR + "/glove.6B." + str(EMBED_SIZE) + "d.txt"
@@ -116,6 +116,8 @@ for line in ftext:
             word = word.lower()
             word_freqs[word] += 1
         sents.append(sent)
+        if len(sents) >= MAX_LINE_NUMBER:
+            break
 ftext.close()
 
 
@@ -161,13 +163,11 @@ auto_encoder = Model(inputs, decoded)
 
 auto_encoder.compile(optimizer="sgd", loss="mse")
 
-if not os.path.exists(CACHE_DIR):
-    os.makedirs(CACHE_DIR)
 
 # train
 num_train_steps = len(Xtrain) // BATCH_SIZE
 num_test_steps = len(Xtest) // BATCH_SIZE
-checkpoint = ModelCheckpoint(filepath=os.path.join(CACHE_DIR, "sent-autoencoder.h5"),
+checkpoint = ModelCheckpoint(filepath=os.path.join(MODEL_DIR, "sent-autoencoder.h5"),
                              save_best_only=True)
 history = auto_encoder.fit_generator(train_gen,
                                      steps_per_epoch=num_train_steps,
