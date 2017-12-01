@@ -17,14 +17,11 @@ import zipfile
 INPUT_FILE = "../../../data/umich-sentiment-train.txt"
 VOCAB_SIZE = 5000
 EMBED_SIZE = 100
-NUM_FILTERS = 256
-NUM_WORDS = 3
 BATCH_SIZE = 64
 NUM_EPOCHS = 10
-MAX_LINE_NUMBER = 1000
 
 LATENT_SIZE = 512
-MAX_SEQ_LEN = 5000
+MAX_SEQ_LEN = 50
 
 VERY_LARGE_DATA_DIR = './very_large_data'
 NEWS_DATA_DIR = './data/news'
@@ -116,8 +113,6 @@ for line in ftext:
             word = word.lower()
             word_freqs[word] += 1
         sents.append(sent)
-        if len(sents) >= MAX_LINE_NUMBER:
-            break
 ftext.close()
 
 
