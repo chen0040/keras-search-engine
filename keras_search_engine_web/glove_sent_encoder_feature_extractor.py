@@ -77,7 +77,7 @@ class WordVecGloveDocFeatureExtractor(object):
     context = None
 
     def __init__(self):
-        self.word2id = np.load(os.path.join(MODEL_DIR, 'sent-autoencoder-word2id.np')).items()
+        self.word2id = np.load(os.path.join(MODEL_DIR, 'sent-autoencoder-word2id.npy')).item()
         self.embedding = load_glove_vectors(self.word2id, EMBED_SIZE)
 
         # define auto-encoder network
