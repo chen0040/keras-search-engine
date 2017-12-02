@@ -1,4 +1,4 @@
-from keras_search_engine_web.glove_feature_extractor import WordVecGloveFeatureExtractor
+from keras_search_engine_web.glove_sent_encoder_feature_extractor import WordVecGloveDocFeatureExtractor
 import numpy as np
 import os
 
@@ -36,7 +36,7 @@ class GloveDocSearchEngine(object):
     use_cosine_distance = True
 
     def __init__(self):
-        self.fe = WordVecGloveFeatureExtractor()
+        self.fe = WordVecGloveDocFeatureExtractor()
         self.doc_features = []
         if not os.path.exists('uploads'):
             os.makedirs('uploads')

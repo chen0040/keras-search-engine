@@ -125,8 +125,8 @@ id2word = {v: k for k, v in word2id.items()}
 
 print("vocabulary sizes:", len(word2id), len(id2word))
 
-np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-word2id.np'), word2id)
-np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-id2word.np'), id2word)
+np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-word2id.npy'), word2id)
+np.save(os.path.join(MODEL_DIR, 'sent-autoencoder-id2word.npy'), id2word)
 
 sent_wids = [[lookup_word2id(word2id, w) for w in s.split()] for s in sents]
 sent_wids = sequence.pad_sequences(sent_wids, MAX_SEQ_LEN)
