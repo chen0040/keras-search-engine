@@ -5,6 +5,8 @@ from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngi
 from keras_search_engine_web.glove_sent_encoder_search_engine import GloveDocEncoderSearchEngine
 import os
 from werkzeug.utils import secure_filename
+import json
+import numpy as np
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -176,10 +178,10 @@ def search_text():
 
     docs = []
     if model == 'glove':
-        docs = glove_doc_search_engine.query_top_k(query, k=limit)
+        docs = glove_doc_search_engine.query_top_k(query, k=limit).tolist()
     elif model == 'doc-encoder':
-        docs = glove_doc_encoder_search_engine.query_top_k(query, k=limit)
-    return jsonify({
+        docs = glove_doc_encoder_search_engine.query_top_k(query, k=limit).tolist()
+    return json.dumps({
         'query': query,
         'result': docs,
         'model': model

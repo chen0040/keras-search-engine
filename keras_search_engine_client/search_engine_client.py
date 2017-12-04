@@ -53,7 +53,7 @@ def main():
         client.index_text('In theory, there is no difference between theory and practice. But in practice, there is.')
         client.index_text('I find that the harder I work, the more luck I seem to have.')
     client.search_text(query='mathematician and coffee', limit=3, model='glove')
-    # client.search_text(query='mathematician and coffee', limit=3, model='doc-encoder')
+    client.search_text(query='mathematician and coffee', limit=3, model='doc-encoder')
 
 
 if __name__ == '__main__':

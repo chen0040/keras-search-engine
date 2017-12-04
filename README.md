@@ -79,4 +79,22 @@ To query using the web api, you can run the following python:
 
 ```
 
+## Use SearchEngineClient
+
+There is also a SearchEngineClient class in the keras_search_engine_client, the sample codes looks like:
+
+```python
+from keras_search_engine_client.search_engine_client import SearchEngineClient
+client = SearchEngineClient()
+doc_count = client.doc_count()
+if doc_count < 4:
+    client.index_text('Whether you think that you can, or that you can.')
+    client.index_text('Try to learn something about everything and everything about something.')
+    client.index_text('You can avoid reality, but you cannot avoid the consequences of avoiding reality.')
+    client.index_text('A mathematician is a device for turning coffee into theorems.')
+    client.index_text('In theory, there is no difference between theory and practice. But in practice, there is.')
+    client.index_text('I find that the harder I work, the more luck I seem to have.')
+client.search_text(query='mathematician and coffee', limit=3, model='glove')
+client.search_text(query='mathematician and coffee', limit=3, model='doc-encoder')
+```
 
