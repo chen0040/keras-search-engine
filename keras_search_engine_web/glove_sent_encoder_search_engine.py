@@ -29,7 +29,7 @@ def get_content(path):
         return file.read()
 
 
-class GloveDocSearchEngine(object):
+class GloveDocEncoderSearchEngine(object):
     fe = None
     doc_features = None
     doc_paths = dict()
@@ -127,7 +127,7 @@ class GloveDocSearchEngine(object):
 
 
 def main():
-    search_engine = GloveDocSearchEngine()
+    search_engine = GloveDocEncoderSearchEngine()
     search_engine.test_run()
 
 

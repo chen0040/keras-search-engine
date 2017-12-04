@@ -2,6 +2,7 @@ from flask import Flask, request, send_from_directory, send_file, redirect, rend
     make_response, abort
 from keras_search_engine_web.glove_doc_search_engine import GloveDocSearchEngine
 from keras_search_engine_web.vgg16_img_search_engine import VGG16ImageSearchEngine
+from keras_search_engine_web.glove_sent_encoder_search_engine import GloveDocEncoderSearchEngine
 import os
 from werkzeug.utils import secure_filename
 
@@ -20,6 +21,7 @@ glove_story_search_engine = GloveDocSearchEngine()
 
 glove_doc_search_engine = GloveDocSearchEngine()
 vgg16_image_search_engine = VGG16ImageSearchEngine()
+glove_doc_encoder_search_engine = GloveDocEncoderSearchEngine()
 
 
 @app.route('/')
@@ -143,8 +145,18 @@ def index_text():
         doc = request.args.get('doc')
 
     doc_feature = glove_doc_search_engine.index_document(doc)
+    doc_encoder_feature = glove_doc_encoder_search_engine.index_document(doc)
     return jsonify({
-        'doc_feature': doc_feature
+        'glove_doc_feature': doc_feature,
+        'encoder_doc_feature': doc_encoder_feature
+    })
+
+
+@app.route('/doc_count', methods=['GET'])
+def doc_count():
+    return jsonify({
+        'glove_doc_count': glove_doc_search_engine.doc_count(),
+        'encoder_doc_count': glove_doc_encoder_search_engine.doc_count()
     })
 
 
@@ -165,6 +177,8 @@ def search_text():
     docs = []
     if model == 'glove':
         docs = glove_doc_search_engine.query_top_k(query, k=limit)
+    elif model == 'doc-encoder':
+        docs = glove_doc_encoder_search_engine.query_top_k(query, k=limit)
     return jsonify({
         'query': query,
         'result': docs,
@@ -181,6 +195,7 @@ def main():
     glove_story_search_engine.do_default_indexing()
     glove_story_search_engine.test_run()
     glove_doc_search_engine.test_run()
+    glove_doc_encoder_search_engine.test_run()
 
     vgg16_image_search_engine.do_default_indexing()
     vgg16_image_search_engine.test_run()
