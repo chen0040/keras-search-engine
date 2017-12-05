@@ -33,7 +33,7 @@ class GloveDocSearchEngine(object):
     fe = None
     doc_features = None
     doc_paths = dict()
-    use_cosine_distance = True
+    use_cosine_distance = False
 
     def __init__(self):
         self.fe = WordVecGloveFeatureExtractor()
@@ -99,8 +99,8 @@ class GloveDocSearchEngine(object):
             rank = dist[i]
             doc_path = self.doc_paths[doc_id]
             result.append({
-                'doc_id': doc_id,
-                'rank': rank,
+                'doc_id': int(doc_id),
+                'rank': float(rank),
                 'path': doc_path,
                 'content': get_content(doc_path)
             })

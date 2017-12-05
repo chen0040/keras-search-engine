@@ -99,8 +99,8 @@ class GloveDocEncoderSearchEngine(object):
             rank = dist[i]
             doc_path = self.doc_paths[doc_id]
             result.append({
-                'doc_id': doc_id,
-                'rank': rank,
+                'doc_id': int(doc_id),
+                'rank': float(rank),
                 'path': doc_path,
                 'content': get_content(doc_path)
             })

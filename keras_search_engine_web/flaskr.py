@@ -178,9 +178,9 @@ def search_text():
 
     docs = []
     if model == 'glove':
-        docs = glove_doc_search_engine.query_top_k(query, k=limit).tolist()
+        docs = glove_doc_search_engine.query_top_k(query, k=limit)
     elif model == 'doc-encoder':
-        docs = glove_doc_encoder_search_engine.query_top_k(query, k=limit).tolist()
+        docs = glove_doc_encoder_search_engine.query_top_k(query, k=limit)
     return json.dumps({
         'query': query,
         'result': docs,
