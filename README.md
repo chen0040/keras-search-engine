@@ -96,5 +96,7 @@ if doc_count < 4:
     client.index_text('I find that the harder I work, the more luck I seem to have.')
 client.search_text(query='mathematician and coffee', limit=3, model='glove')
 client.search_text(query='mathematician and coffee', limit=3, model='doc-encoder')
+
+client.search_image('./images/Pokemon1.jpg', 6)
 ```
 
