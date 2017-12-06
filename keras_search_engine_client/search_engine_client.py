@@ -1,13 +1,23 @@
 import json
 import urllib
 import urllib.request
-
+import requests
 
 class SearchEngineClient(object):
     baseUrl = None
 
     def __init__(self):
         self.baseUrl = 'http://localhost:5000'
+
+    def index_image(self, img_src):
+        files = {'file': open(img_src, 'rb')}
+        r = requests.post(self.baseUrl + '/index_image', files=files)
+        print(r.text)
+
+    def search_image(self, img_src, limit):
+        files = {'file': open(img_src, 'rb')}
+        r = requests.post(self.baseUrl + '/search_image/' + str(limit), files=files)
+        print(r.text)
 
     def index_text(self, text):
         new_request = {"doc": text}
@@ -54,6 +64,9 @@ def main():
         client.index_text('I find that the harder I work, the more luck I seem to have.')
     client.search_text(query='mathematician and coffee', limit=10, model='glove')
     client.search_text(query='mathematician and coffee', limit=10, model='doc-encoder')
+
+    # img_count = client.img_count()
+    client.search_image('./images/Pokemon1.jpg', 6)
 
 
 if __name__ == '__main__':

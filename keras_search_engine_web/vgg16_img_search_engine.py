@@ -56,8 +56,8 @@ class VGG16ImageSearchEngine(object):
             rank = dist[i]
             img_path = self.img_paths[img_id]
             result.append({
-                'img_id': img_id,
-                'rank': rank,
+                'img_id': int(img_id),
+                'rank': float(rank),
                 'path': img_path
             })
         return result

@@ -128,7 +128,7 @@ def search_image(limit):
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
-        images = vgg16_image_search_engine.query_top_k(file_path, k=limit)
+        images = vgg16_image_search_engine.query_top_k(file_path, k=int(limit))
         return jsonify({
             'query': file_path,
             'result': images
