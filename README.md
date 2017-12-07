@@ -26,7 +26,7 @@ Now navigate your browser to http://localhost:5000 and you can try out
 * the story book search (by which user enters search query on the story books that are loaded from keras_search_engine_train/data/texts)
 * the image search (by which user uploads an image to search among images stored in the keras_search_engine_train/data/images)
 
-## Invoke web api to index text document
+## Invoke web api to index and search text document
 
 With the web api server running, you can index a new document by calling the following web api:
 
@@ -51,7 +51,7 @@ To query using the web api, you can call the following web api:
 curl -H 'Content-Type application/json' -X POST -d '{"query":"mathematician and coffee", "limit": 3, "model": "glove"}' http://localhost:5000/search_text
 ```
 
-## Invoke web api to index text document
+## Invoke web api to index and search image 
 
 With the web api server running, you can index a new image by calling the following web api via POST request:
 
@@ -67,17 +67,7 @@ http://localhost:5000/search_image/10
 
 where 10 is the limit on the number of images returned
 
-For example the following python code the web api to index an image:
 
-```python 
-
-```
-
-To query using the web api, you can run the following python:
-
-```python
-
-```
 
 ## Use SearchEngineClient
 
@@ -86,6 +76,8 @@ There is also a SearchEngineClient class in the keras_search_engine_client, the 
 ```python
 from keras_search_engine_client.search_engine_client import SearchEngineClient
 client = SearchEngineClient()
+
+# text indexing and search
 doc_count = client.doc_count()
 if doc_count < 4:
     client.index_text('Whether you think that you can, or that you can.')
@@ -97,6 +89,8 @@ if doc_count < 4:
 client.search_text(query='mathematician and coffee', limit=3, model='glove')
 client.search_text(query='mathematician and coffee', limit=3, model='doc-encoder')
 
+# image indexing and search
+client.index_image('./images/Pokemon7.png')
 client.search_image('./images/Pokemon1.jpg', 6)
 ```
 

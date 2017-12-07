@@ -66,6 +66,7 @@ def main():
     client.search_text(query='mathematician and coffee', limit=10, model='doc-encoder')
 
     # img_count = client.img_count()
+    client.index_image('./images/Pokemon7.png')
     client.search_image('./images/Pokemon1.jpg', 6)
 
 
