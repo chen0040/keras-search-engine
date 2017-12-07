@@ -162,6 +162,13 @@ def doc_count():
     })
 
 
+@app.route('/img_count', methods=['GET'])
+def img_count():
+    return jsonify({
+        'vgg16_img_count': vgg16_image_search_engine.img_count()
+    })
+
+
 @app.route('/search_text', methods=['POST', 'GET'])
 def search_text():
     if request.method == 'POST':
