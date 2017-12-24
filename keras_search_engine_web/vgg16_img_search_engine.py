@@ -82,5 +82,6 @@ def main():
     search_engine = VGG16ImageSearchEngine()
     search_engine.test_run()
 
+
 if __name__ == '__main__':
     main()
