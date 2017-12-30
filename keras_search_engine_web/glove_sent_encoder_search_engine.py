@@ -122,7 +122,7 @@ class GloveDocEncoderSearchEngine(object):
 
     def test_run(self):
         if self.doc_count() == 0:
-            self.index_documents(['Hello World', 'What a wonderful world!'])
+            self.index_documents(['What a wonderful world!', 'Hello World'])
         print(self.rank_top_k('Hello', k=30))
 
 

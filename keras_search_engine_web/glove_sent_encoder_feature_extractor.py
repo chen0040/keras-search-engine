@@ -98,8 +98,7 @@ class WordVecGloveDocFeatureExtractor(object):
         sent_wids = [[lookup_word2id(self.word2id, w) for w in sentence.split()]]
         sent_wids = sequence.pad_sequences(sent_wids, MAX_SEQ_LEN)
         X = self.embedding[sent_wids]
-        x = self.auto_encoder.predict(X)[0]
-        return np.array(x).flatten()
+        return self.auto_encoder.predict(X).flatten()
 
     def extract_all(self, sentences):
         doc_count = len(sentences)
