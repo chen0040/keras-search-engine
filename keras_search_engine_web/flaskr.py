@@ -209,7 +209,7 @@ def main():
     vgg16_image_search_engine.do_default_indexing()
     vgg16_image_search_engine.test_run()
 
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
 
 
 if __name__ == '__main__':
